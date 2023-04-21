@@ -35,7 +35,6 @@ public class ToolCreateChannelApplication {
 		ChromeOptions options = new ChromeOptions();
 		options.addArguments("--remote-allow-origins=*");
 		options.addArguments("--disable-notifications");
-		WebDriver driver = new ChromeDriver(options);
 
 		// Đọc file chứa email và mật khẩu
 		BufferedReader br = new BufferedReader(new FileReader(filePath));
@@ -46,18 +45,27 @@ public class ToolCreateChannelApplication {
 		String fileName = "gmail_error_" + now.format(formatter) + ".txt";
 
 		List<String> data = new ArrayList<String>();
-
+		WebDriver driver = null;
 		while ((line = br.readLine()) != null) {
 			line = line.replaceAll("\\s+", " "); // xóa các khoảng trắng dư thừa và giữ lại một dấu cách
 			String[] parts = line.split(" "); // tách email và password ra từ chuỗi dữ liệu
 			String email = parts[0];
 			String password = parts[1];
 
+			driver = new ChromeDriver(options);
+			
 			driver.get("https://www.youtube.com/");
 			Thread.sleep(tenSeconds); // đợi 10 giây
 
-			WebElement signIn = driver.findElement(By.xpath("//a[@aria-label='Đăng nhập' or @aria-label='Sign in']"));
-			signIn.click();
+			try {
+				WebElement signIn = driver
+						.findElement(By.xpath("//a[@aria-label='Đăng nhập' or @aria-label='Sign in']"));
+				signIn.click();
+			} catch (Exception e) {
+				System.out.println("Error: " + e.getMessage() + ". " + e.getCause());
+				driver.quit();
+				continue;
+			}
 
 			Thread.sleep(fiveSeconds); // đợi 5 giây
 			// Điền email và mật khẩu vào các phần tử input tương ứng
@@ -88,9 +96,10 @@ public class ToolCreateChannelApplication {
 					WebElement signInButton = driver.findElement(By.xpath("//div[@id='passwordNext']"));
 					signInButton.click();
 				} catch (Exception e2) {
+					System.out.println("Error: " + e.getMessage() + ". " + e.getCause());
 					String st = email + " " + password;
 					data.add(st);
-					System.out.println("Error: " + e.getMessage() + ". " + e.getCause());
+					driver.quit();
 					continue;
 				}
 			}
@@ -101,9 +110,10 @@ public class ToolCreateChannelApplication {
 				WebElement avatarBtn = driver.findElement(By.xpath("//button[@id='avatar-btn']"));
 				avatarBtn.click();
 			} catch (Exception e) {
+				System.out.println("Error: " + e.getMessage() + ". " + e.getCause());
 				String st = email + " " + password;
 				data.add(st);
-				System.out.println("Error: " + e.getMessage() + ". " + e.getCause());
+				driver.quit();
 				continue;
 			}
 			Thread.sleep(fiveSeconds); // đợi 5 giây
@@ -133,9 +143,10 @@ public class ToolCreateChannelApplication {
 					JavascriptExecutor executor = (JavascriptExecutor) driver;
 					executor.executeScript("arguments[0].click();", signout);
 				} catch (Exception e2) {
+					System.out.println("Error: " + e.getMessage() + ". " + e.getCause());
 					String st = email + " " + password;
 					data.add(st);
-					System.out.println("Error: " + e.getMessage() + ". " + e.getCause());
+					driver.quit();
 					continue;
 				}
 			}
