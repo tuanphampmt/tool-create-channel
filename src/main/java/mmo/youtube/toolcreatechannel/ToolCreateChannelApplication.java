@@ -27,7 +27,8 @@ public class ToolCreateChannelApplication {
 	public static final int tenSeconds = 8000;
 	public static final int threeeconds = 2500;
 	public static final String filePath = "gmail.txt";
-
+	public static final int numberThreads = 5;
+	
 	public static void main(String[] args) throws IOException, InterruptedException {
 		SpringApplication.run(ToolCreateChannelApplication.class, args);
 		// Khởi tạo ChromeDriver
@@ -45,15 +46,14 @@ public class ToolCreateChannelApplication {
 		String fileName = "gmail_error_" + now.format(formatter) + ".txt";
 
 		List<String> data = new ArrayList<String>();
-		WebDriver driver = null;
 		while ((line = br.readLine()) != null) {
 			line = line.replaceAll("\\s+", " "); // xóa các khoảng trắng dư thừa và giữ lại một dấu cách
 			String[] parts = line.split(" "); // tách email và password ra từ chuỗi dữ liệu
 			String email = parts[0];
 			String password = parts[1];
 
-			driver = new ChromeDriver(options);
-			
+			WebDriver driver = new ChromeDriver(options);
+
 			driver.get("https://www.youtube.com/");
 			Thread.sleep(tenSeconds); // đợi 10 giây
 
@@ -63,6 +63,8 @@ public class ToolCreateChannelApplication {
 				signIn.click();
 			} catch (Exception e) {
 				System.out.println("Error: " + e.getMessage() + ". " + e.getCause());
+				String st = email + " " + password;
+				data.add(st);
 				driver.quit();
 				continue;
 			}
@@ -80,28 +82,11 @@ public class ToolCreateChannelApplication {
 				WebElement signInButton = driver.findElement(By.xpath("//div[@id='passwordNext']"));
 				signInButton.click();
 			} catch (Exception e) {
-				try {
-					System.out.println("Error: " + e.getMessage() + ". " + e.getCause());
-					WebElement anotherAccount = driver.findElement(By.xpath(
-							"//div[contains(text(), 'Sử dụng một tài khoản khác') or contains(text(), 'Use another account')]"));
-					anotherAccount.click();
-					Thread.sleep(fiveSeconds); // đợi 5 giây
-					WebElement emailInput = driver.findElement(By.xpath("//input[@type='email']"));
-					emailInput.sendKeys(email);
-					WebElement nextButton = driver.findElement(By.xpath("//div[@id='identifierNext']"));
-					nextButton.click();
-					Thread.sleep(fiveSeconds); // đợi 5 giây
-					WebElement passwordInput = driver.findElement(By.xpath("//input[@type='password']"));
-					passwordInput.sendKeys(password);
-					WebElement signInButton = driver.findElement(By.xpath("//div[@id='passwordNext']"));
-					signInButton.click();
-				} catch (Exception e2) {
-					System.out.println("Error: " + e.getMessage() + ". " + e.getCause());
-					String st = email + " " + password;
-					data.add(st);
-					driver.quit();
-					continue;
-				}
+				System.out.println("Error: " + e.getMessage() + ". " + e.getCause());
+				String st = email + " " + password;
+				data.add(st);
+				driver.quit();
+				continue;
 			}
 
 			// Đợi một chút để đảm bảo các hành động trước đó đã hoàn thành
@@ -151,6 +136,7 @@ public class ToolCreateChannelApplication {
 				}
 			}
 			System.out.println("Successfully created channel with Email: " + email);
+			driver.quit();
 		}
 		br.close();
 
@@ -165,8 +151,6 @@ public class ToolCreateChannelApplication {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		// Đóng trình duyệt
-		driver.quit();
 	}
 
 }
