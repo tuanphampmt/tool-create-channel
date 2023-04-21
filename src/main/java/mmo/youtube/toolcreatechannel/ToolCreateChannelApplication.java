@@ -1,33 +1,33 @@
 package mmo.youtube.toolcreatechannel;
 
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 public class ToolCreateChannelApplication {
 	public static final int fiveSeconds = 5000;
 	public static final int tenSeconds = 10000;
 	public static final int threeeconds = 3000;
-	
+	public static final String filePath = "gmail.txt";
+
 	public static void main(String[] args) throws IOException, InterruptedException {
 		SpringApplication.run(ToolCreateChannelApplication.class, args);
 		// Khởi tạo ChromeDriver
@@ -37,29 +37,29 @@ public class ToolCreateChannelApplication {
 		options.addArguments("--disable-notifications");
 		WebDriver driver = new ChromeDriver(options);
 
-		// Khai báo đường dẫn tới file chứa email và mật khẩu
-		String filePath = "gmail.txt";
-
 		// Đọc file chứa email và mật khẩu
 		BufferedReader br = new BufferedReader(new FileReader(filePath));
 		String line;
 		int k = 0;
 
-		String fileName = "gmail_error.txt";
+		LocalDateTime now = LocalDateTime.now();
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss");
+		String fileName = "gmail_error_" + now.format(formatter) + ".txt";
+
 		List<String> data = new ArrayList<String>();
 
 		while ((line = br.readLine()) != null) {
-			String[] userInfo = line.split(" ");
-			String email = userInfo[0];
-			String password = userInfo[1];
+			line = line.replaceAll("\\s+", " "); // xóa các khoảng trắng dư thừa và giữ lại một dấu cách
+			String[] parts = line.split(" "); // tách email và password ra từ chuỗi dữ liệu
+			String email = parts[0];
+			String password = parts[1];
 
 			driver.get("https://www.youtube.com/");
 			Thread.sleep(tenSeconds); // đợi 10 giây
-			
-			WebElement signIn = driver
-					.findElement(By.xpath("//a[@aria-label='Đăng nhập' or @aria-label='Sign in']"));
+
+			WebElement signIn = driver.findElement(By.xpath("//a[@aria-label='Đăng nhập' or @aria-label='Sign in']"));
 			signIn.click();
-			
+
 			Thread.sleep(fiveSeconds); // đợi 20 giây
 			// Điền email và mật khẩu vào các phần tử input tương ứng
 			try {
@@ -141,10 +141,10 @@ public class ToolCreateChannelApplication {
 			System.out.println("Email" + k + ": " + email);
 		}
 		br.close();
-		
+
 		Set<String> setWithoutDuplicates = new HashSet<>(data);
-        List<String> masterData = new ArrayList<>(setWithoutDuplicates);
-        
+		List<String> masterData = new ArrayList<>(setWithoutDuplicates);
+
 		try (BufferedWriter bw = new BufferedWriter(new FileWriter(fileName))) {
 			for (String entry : masterData) {
 				bw.write(entry);
