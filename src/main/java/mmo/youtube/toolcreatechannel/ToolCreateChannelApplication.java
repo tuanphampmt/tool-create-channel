@@ -23,9 +23,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 public class ToolCreateChannelApplication {
-	public static final int fiveSeconds = 5000;
-	public static final int tenSeconds = 10000;
-	public static final int threeeconds = 3000;
+	public static final int fiveSeconds = 3000;
+	public static final int tenSeconds = 8000;
+	public static final int threeeconds = 2500;
 	public static final String filePath = "gmail.txt";
 
 	public static void main(String[] args) throws IOException, InterruptedException {
@@ -40,7 +40,6 @@ public class ToolCreateChannelApplication {
 		// Đọc file chứa email và mật khẩu
 		BufferedReader br = new BufferedReader(new FileReader(filePath));
 		String line;
-		int k = 0;
 
 		LocalDateTime now = LocalDateTime.now();
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss");
@@ -60,14 +59,14 @@ public class ToolCreateChannelApplication {
 			WebElement signIn = driver.findElement(By.xpath("//a[@aria-label='Đăng nhập' or @aria-label='Sign in']"));
 			signIn.click();
 
-			Thread.sleep(fiveSeconds); // đợi 20 giây
+			Thread.sleep(fiveSeconds); // đợi 5 giây
 			// Điền email và mật khẩu vào các phần tử input tương ứng
 			try {
 				WebElement emailInput = driver.findElement(By.xpath("//input[@type='email']"));
 				emailInput.sendKeys(email);
 				WebElement nextButton = driver.findElement(By.xpath("//div[@id='identifierNext']"));
 				nextButton.click();
-				Thread.sleep(fiveSeconds); // đợi 10 giây
+				Thread.sleep(fiveSeconds); // đợi 5 giây
 				WebElement passwordInput = driver.findElement(By.xpath("//input[@type='password']"));
 				passwordInput.sendKeys(password);
 				WebElement signInButton = driver.findElement(By.xpath("//div[@id='passwordNext']"));
@@ -78,12 +77,12 @@ public class ToolCreateChannelApplication {
 					WebElement anotherAccount = driver.findElement(By.xpath(
 							"//div[contains(text(), 'Sử dụng một tài khoản khác') or contains(text(), 'Use another account')]"));
 					anotherAccount.click();
-					Thread.sleep(fiveSeconds); // đợi 10 giây
+					Thread.sleep(fiveSeconds); // đợi 5 giây
 					WebElement emailInput = driver.findElement(By.xpath("//input[@type='email']"));
 					emailInput.sendKeys(email);
 					WebElement nextButton = driver.findElement(By.xpath("//div[@id='identifierNext']"));
 					nextButton.click();
-					Thread.sleep(fiveSeconds); // đợi 10 giây
+					Thread.sleep(fiveSeconds); // đợi 5 giây
 					WebElement passwordInput = driver.findElement(By.xpath("//input[@type='password']"));
 					passwordInput.sendKeys(password);
 					WebElement signInButton = driver.findElement(By.xpath("//div[@id='passwordNext']"));
@@ -92,6 +91,7 @@ public class ToolCreateChannelApplication {
 					String st = email + " " + password;
 					data.add(st);
 					System.out.println("Error: " + e.getMessage() + ". " + e.getCause());
+					continue;
 				}
 			}
 
@@ -104,13 +104,14 @@ public class ToolCreateChannelApplication {
 				String st = email + " " + password;
 				data.add(st);
 				System.out.println("Error: " + e.getMessage() + ". " + e.getCause());
+				continue;
 			}
 			Thread.sleep(fiveSeconds); // đợi 5 giây
 			try {
 				WebElement subtitle = driver.findElement(By.xpath(
 						"//yt-formatted-string[contains(text(), 'Tạo kênh') or contains(text(), 'Create a channel')][@id='label']"));
 				subtitle.click();
-				Thread.sleep(tenSeconds); // đợi 5 giây
+				Thread.sleep(tenSeconds); // đợi 10 giây
 				WebElement createChannel = driver
 						.findElement(By.xpath("//button[@aria-label='Tạo kênh' or @aria-label='Create channel']"));
 				createChannel.click();
@@ -135,10 +136,10 @@ public class ToolCreateChannelApplication {
 					String st = email + " " + password;
 					data.add(st);
 					System.out.println("Error: " + e.getMessage() + ". " + e.getCause());
+					continue;
 				}
 			}
-			k = k + 1;
-			System.out.println("Email" + k + ": " + email);
+			System.out.println("Successfully created channel with Email: " + email);
 		}
 		br.close();
 
