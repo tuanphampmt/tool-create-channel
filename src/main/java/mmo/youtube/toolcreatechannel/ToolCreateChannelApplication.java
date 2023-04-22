@@ -68,7 +68,7 @@ class WorkerThread implements Runnable {
 	private final List<String> data;
 	public final int fiveSeconds = 5000;
 	public final int tenSeconds = 10000;
-	public final int threeeconds = 3000;
+	public final int threeseconds = 3000;
 
 	public WorkerThread(String email, String password, String emailRecovery, ChromeOptions options, List<String> data) {
 		this.email = email;
@@ -85,7 +85,6 @@ class WorkerThread implements Runnable {
 		WebDriverWait wait = new WebDriverWait(driver, duration);
 		try {
 			driver.get("https://www.youtube.com/");
-
 			try {
 				WebElement signIn = wait.until(ExpectedConditions
 						.presenceOfElementLocated(By.xpath("//a[@aria-label='Đăng nhập' or @aria-label='Sign in']")));
@@ -159,12 +158,11 @@ class WorkerThread implements Runnable {
 						.findElement(By.xpath("//button[@aria-label='Tạo kênh' or @aria-label='Create channel']"));
 				createChannel.click();
 				Thread.sleep(tenSeconds); // đợi 10 giây
+				System.out.println("Successfully created channel with Email: " + email);
 			} catch (Exception e) {
 				System.out.println("Error: " + e.getMessage() + ". " + e.getCause());
 				driver.quit();
 			}
-
-			System.out.println("Successfully created channel with Email: " + email);
 			driver.quit();
 		} catch (Exception e) {
 			e.printStackTrace();
