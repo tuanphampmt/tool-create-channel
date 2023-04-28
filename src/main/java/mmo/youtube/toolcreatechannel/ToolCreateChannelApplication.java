@@ -26,7 +26,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class ToolCreateChannelApplication {
 	public static final String filePath = "gmail.txt";
-	public static final int numberThreads = 5;
+	public static final int numberThreads = 10;
 
 	public static void main(String[] args) throws IOException, InterruptedException {
 		SpringApplication.run(ToolCreateChannelApplication.class, args);
@@ -103,7 +103,7 @@ class WorkerThread implements Runnable {
 				emailInput.sendKeys(email);
 				WebElement nextButton = driver.findElement(By.xpath("//div[@id='identifierNext']"));
 				nextButton.click();
-				Thread.sleep(fiveSeconds); // đợi 5 giây
+				Thread.sleep(tenSeconds); // đợi 5 giây
 				WebElement passwordInput = driver.findElement(By.xpath("//input[@type='password']"));
 				passwordInput.sendKeys(password);
 				WebElement signInButton = driver.findElement(By.xpath("//div[@id='passwordNext']"));
@@ -165,7 +165,10 @@ class WorkerThread implements Runnable {
 			}
 			driver.quit();
 		} catch (Exception e) {
-			e.printStackTrace();
+			System.out.println("Error: " + e.getMessage() + ". " + e.getCause());
+			String st = email + " " + password + " " + emailRecovery;
+			data.add(st);
+			driver.quit();
 		} finally {
 			Set<String> setWithoutDuplicates = new HashSet<>(data);
 			List<String> masterData = new ArrayList<>(setWithoutDuplicates);
@@ -178,6 +181,7 @@ class WorkerThread implements Runnable {
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
+				driver.quit();
 			}
 		}
 
